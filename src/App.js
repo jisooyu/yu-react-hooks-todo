@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useReducer } from 'react';
+import './styles.css';
+import todosReducer from './reducers/todos';
+import TodoListContext from './context/TodoListContext';
+import AddTodo from './component/AddTodo';
+import TodoList from './component/TodoList';
 
-function App() {
+export default function App() {
+  const [todoList, dispatch] = useReducer(todosReducer, []);
+
+  useEffect(() => {
+    const todoList = JSON.parse(localStorage.getItem('todoList'));
+    if (todoList) {
+      dispatch({ type: 'POPULATE_TODO_ITEM', todoList });
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+  }, [todoList]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <TodoListContext.Provider value={{ todoList, dispatch }}>
+      <AddTodo />
+      <TodoList />
+    </TodoListContext.Provider>
   );
 }
-
-export default App;
